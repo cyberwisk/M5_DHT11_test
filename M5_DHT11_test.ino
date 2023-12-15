@@ -1,3 +1,15 @@
+/**
+ * @file M5_TDH11_test.ino
+ * @author Aurélio Avanzi
+ * @brief M5StickCPlus DHT11_test
+ * @version 0.1
+ * @date 2023-12-12
+ *
+ * @Hardwares: M5Cardputer
+ * @Platform Version: Arduino M5Stack Board Manager v2.0.7
+ * @Dependent Library:
+ */
+
 #include "M5StickCPlus.h"
 #include "AXP192.h"
 #include "DHT.h"
@@ -18,8 +30,6 @@ DHT dht(DHTPIN, DHTTYPE);
 void setup() {
 M5.begin();
 M5.Lcd.setRotation(0);
-Serial.begin(9600);
-Serial.println("DHTxx test!");
 dht.begin();
 
     RTC_TimeTypeDef TimeStruct;
@@ -49,16 +59,21 @@ float t = dht.readTemperature();
 // Read temperature as Fahrenheit
 float f = dht.readTemperature(true);
 
-// Check if any reads failed and exit early (to try again).
-if (isnan(h) || isnan(t) || isnan(f)) {
-Serial.println("Failed to read from DHT sensor!");
-return;
-}
 M5.Lcd.setCursor(0, 0, 2);
 M5.Lcd.setTextColor(TFT_WHITE,TFT_BLACK);
 M5.Lcd.setTextSize(1);
 M5.Lcd.print(" DHT11 Temp/Humid ");
 M5.Lcd.println("");
+// Check if any reads failed and exit early (to try again).
+if (isnan(h) || isnan(t) || isnan(f)) {
+  M5.Lcd.setTextColor(TFT_RED,TFT_BLACK);
+  M5.Lcd.setTextSize(2);
+  M5.Lcd.println(" ---------");
+  M5.Lcd.println("NO DHT11");
+  M5.Lcd.println("  in G26  ");
+  M5.Lcd.println(" ---------");
+return;
+}
 // Compute heat index
 // Must send in temp in Fahrenheit!
 float hi = dht.computeHeatIndex(f, h);
@@ -74,7 +89,7 @@ M5.Lcd.setTextColor(TFT_RED,TFT_BLACK);
 M5.Lcd.setTextSize(2);
 M5.Lcd.print(" ");
 M5.Lcd.print(t);
-M5.Lcd.println("°");
+M5.Lcd.println("c");
 M5.Lcd.setTextSize(1);
 M5.Lcd.setTextColor(TFT_GREEN,TFT_BLACK);
 //M5.Lcd.print(" Heat index: ");
